@@ -1,15 +1,30 @@
-const assert = require('assert');
+const assert = require("assert");
+const vscode = require("vscode");
+const myExtension = require("../extension");
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-const vscode = require('vscode');
-// const myExtension = require('../extension');
+suite("Extension Test Suite", () => {
+  vscode.window.showInformationMessage("Start all tests.");
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+  test("getInstalledThemes returns an array", () => {
+    const themes = myExtension.getInstalledThemes();
+    assert.strictEqual(Array.isArray(themes), true);
+  });
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+  test("Commands are registered", async () => {
+    const commands = await vscode.commands.getCommands(true);
+    assert.strictEqual(
+      commands.includes("copy-syntax-in-light.copySyntaxInLight"),
+      true
+    );
+    assert.strictEqual(
+      commands.includes("copy-syntax-in-light.selectTheme"),
+      true
+    );
+  });
+
+  test("Configuration property defaults to current", () => {
+    const config = vscode.workspace.getConfiguration();
+    const customTheme = config.get("copySyntaxInLight.customTheme");
+    assert.strictEqual(customTheme, "current");
+  });
 });
